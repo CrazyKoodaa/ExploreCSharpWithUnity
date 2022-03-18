@@ -3,6 +3,241 @@ History
 -------
 
 
+13.0.7 (2020-02-13)
++++++++++++++++++++
+
+- Split bundled pygments library for Python 2.7+.
+- Upgrade pygments for py27+ to v2.5.2 development master.
+
+
+13.0.6 (2020-02-11)
++++++++++++++++++++
+
+- Force requests to use bundled ca cert from certifi by default.
+
+
+13.0.5 (2020-02-11)
++++++++++++++++++++
+
+- Upgrade bundled certifi to v2019.11.28.
+
+
+13.0.4 (2020-02-05)
++++++++++++++++++++
+
+- Bundle cryptography, pyopenssl, and ipaddress packages for improved SSL
+  support on Python2.
+
+
+13.0.3 (2019-12-04)
++++++++++++++++++++
+
+- Support slashes in Mercurial and Git branch names.
+  `#199 <https://github.com/wakatime/wakatime/issues/199>`_
+
+
+13.0.2 (2019-11-12)
++++++++++++++++++++
+
+- Filter dependencies longer than 200 characters.
+- Close sqlite connection even when error raised.
+  `#196 <https://github.com/wakatime/wakatime/issues/196>`_
+
+
+13.0.1 (2019-10-25)
++++++++++++++++++++
+
+- Detect ColdFusion as root language instead of HTML.
+
+
+13.0.0 (2019-08-24)
++++++++++++++++++++
+
+- New arguments for reading and writing ini config file.
+- Today argument shows categories when available.
+- Prevent unnecessarily debug log when syncing offline heartbeats.
+- Support for Python 3.7.
+
+
+12.0.0 (2019-06-23)
++++++++++++++++++++
+
+- New optional config option hide_branch_names.
+  `#183 <https://github.com/wakatime/wakatime/issues/183>`_
+
+
+11.0.0 (2019-05-07)
++++++++++++++++++++
+
+- Rename argument --show-time-today to --today.
+
+
+10.9.0 (2019-05-07)
++++++++++++++++++++
+
+- New argument --show-time-today for printing Today's coding time.
+
+
+10.8.4 (2019-04-30)
++++++++++++++++++++
+
+- Use wakatime fork of certifi package.
+  `sublime-wakatime#95 <https://github.com/wakatime/sublime-wakatime/issues/95>`_
+
+
+10.8.3 (2019-04-30)
++++++++++++++++++++
+
+- Upgrade certifi to version 2019.03.09.
+
+
+10.8.2 (2019-03-27)
++++++++++++++++++++
+
+- Detect go.mod files as Go language.
+  `jetbrains-wakatime#119 <https://github.com/wakatime/jetbrains-wakatime/issues/119>`_
+
+
+10.8.1 (2019-03-11)
++++++++++++++++++++
+
+- Detect C++ language from all C++ file extensions.
+  `vscode-wakatime#87 <https://github.com/wakatime/vscode-wakatime/issues/87>`_
+
+
+10.8.0 (2019-01-17)
++++++++++++++++++++
+
+- Add ssl_certs_file arg and config for custom ca bundles.
+  `#164 <https://github.com/wakatime/wakatime/issues/164>`_
+
+
+10.7.1 (2019-01-05)
++++++++++++++++++++
+
+- Fix bug causing random project names when hide project names enabled.
+  `vscode-wakatime#162 <https://github.com/wakatime/vscode-wakatime/issues/61>`_
+
+
+10.7.0 (2018-12-28)
++++++++++++++++++++
+
+- Add support for UNC network shares without drive letter mapped on Winows.
+  `#162 <https://github.com/wakatime/wakatime/issues/162>`_
+
+
+10.6.1 (2018-12-19)
++++++++++++++++++++
+
+- Correctly parse include_only_with_project_file when set to false.
+  `#161 <https://github.com/wakatime/wakatime/issues/161>`_
+
+
+10.6.0 (2018-11-05)
++++++++++++++++++++
+
+- Support language argument for non-file entity types.
+- Send 25 heartbeats per API request.
+
+
+10.5.0 (2018-11-03)
++++++++++++++++++++
+
+- New category "Writing Tests".
+  `#156 <https://github.com/wakatime/wakatime/issues/156>`_
+
+
+10.4.2 (2018-10-23)
++++++++++++++++++++
+
+- Fix bug caused by git config section without any submodule option defined.
+  `#152 <https://github.com/wakatime/wakatime/issues/152>`_
+
+
+10.4.1 (2018-10-05)
++++++++++++++++++++
+
+- Send 50 offline heartbeats to API per request with 1 second delay in between.
+
+
+10.4.0 (2018-10-03)
++++++++++++++++++++
+
+- Support logging coding activity to remote network drive files on Windows
+  platform by detecting UNC path from drive letter.
+  `#72 <https://github.com/wakatime/wakatime/issues/72>`_
+
+
+10.3.0 (2018-09-30)
++++++++++++++++++++
+
+- Re-enable detecting projects from Subversion folder on Windows platform.
+- Prevent opening cmd window on Windows when detecting project from Subversion.
+- Run tests on Windows using Appveyor.
+
+
+10.2.4 (2018-09-20)
++++++++++++++++++++
+
+- Default --sync-offline-activity to 100 instead of 5, so offline coding is
+  synced to dashboard faster.
+
+
+10.2.3 (2018-09-20)
++++++++++++++++++++
+
+- Batch heartbeats in groups of 10 per api request.
+
+
+10.2.2 (2018-09-20)
++++++++++++++++++++
+
+- New config hide_project_name and argument --hide-project-names for
+  obfuscating project names when sending coding activity to api.
+- Fix mispelled Gosu language.
+  `#137 <https://github.com/wakatime/wakatime/issues/137>`_
+- Remove metadata when hiding project or file names.
+- New --local-file argument to be used when --entity is a remote file.
+- New argument --sync-offline-activity for configuring the maximum offline
+  heartbeats to sync to the WakaTime API.
+
+
+10.2.1 (2018-04-26)
++++++++++++++++++++
+
+- Support for project detection from git worktree folders.
+
+
+10.2.0 (2018-04-15)
++++++++++++++++++++
+
+- Force forward slash for file paths.
+- New --category argument.
+- New --exclude-unknown-project argument and corresponding config setting.
+
+
+10.1.3 (2018-03-14)
++++++++++++++++++++
+
+- Smarter C vs C++ vs Objective-C language detection.
+
+
+10.1.2 (2018-03-14)
++++++++++++++++++++
+
+- Detect dependencies from Elm, Haskell, Haxe, Kotlin, Rust, and Scala files.
+- Improved Matlab vs Objective-C language detection.
+  `#129 <https://github.com/wakatime/wakatime/issues/129>`_
+
+
+10.1.1 (2018-03-11)
++++++++++++++++++++
+
+- Detect dependencies from Swift, Objective-C, TypeScript and JavaScript files.
+- Categorize .mjs files as JavaScript.
+  `#121 <https://github.com/wakatime/wakatime/issues/121>`_
+
+
 10.1.0 (2018-01-04)
 +++++++++++++++++++
 

@@ -2,6 +2,10 @@
     :target: https://travis-ci.org/wakatime/wakatime
     :alt: Tests
 
+.. image:: https://ci.appveyor.com/api/projects/status/g9snpluqi8svrgbn/branch/master?svg=true
+    :target: https://ci.appveyor.com/project/alanhamlett/wakatime-jl10s/branch/master
+    :alt: Windows Tests
+
 .. image:: https://coveralls.io/repos/wakatime/wakatime/badge.svg?branch=master&service=github
     :target: https://coveralls.io/github/wakatime/wakatime?branch=master
     :alt: Coverage
@@ -13,6 +17,10 @@
 .. image:: https://img.shields.io/pypi/pyversions/wakatime.svg
     :target: https://pypi.python.org/pypi/wakatime
     :alt: Supported Python Versions
+
+.. image:: https://wakatime.com/badge/github/wakatime/wakatime.svg?branch=master
+    :target: https://wakatime.com/
+    :alt: Code time tracker
 
 
 WakaTime
@@ -60,7 +68,9 @@ format. An example config file with all available options::
     [settings]
     debug = false
     api_key = your-api-key
-    hide_filenames = false
+    hide_file_names = false
+    hide_project_names = false
+    hide_branch_names =
     exclude =
         ^COMMIT_EDITMSG$
         ^TAG_EDITMSG$
@@ -68,10 +78,13 @@ format. An example config file with all available options::
         ^/etc/
     include =
         .*
-    only_include_with_project_file = false
+    include_only_with_project_file = false
+    status_bar_icon = true
+    status_bar_coding_activity = true
     offline = true
     proxy = https://user:pass@localhost:8080
     no_ssl_verify = false
+    ssl_certs_file =
     timeout = 30
     hostname = machinename
     [projectmap]
@@ -127,19 +140,25 @@ Useful Resources:
 Contributing
 ------------
 
-Before contributing a pull request, make sure tests pass::
-
-    virtualenv venv
-    . venv/bin/activate
-    pip install tox
-    tox
-
-The above will run tests on all Python versions available on your machine.
-To just run tests on a single Python version::
+To install the dev environment::
 
     virtualenv venv
     . venv/bin/activate
     pip install -r dev-requirements.txt
+    pip install tox
+
+Before contributing a pull request, make sure tests pass::
+
+    tox
+
+The above will run tests on all Python versions available on your machine.
+To just run all tests with your current Python version::
+
     nosetests
+
+To run only a single test method, specify the test file location, test class,
+and test method. For example, to only run the Git project detection test::
+
+    nosetests tests.test_project:ProjectTestCase.test_git_project_detected
 
 Many thanks to all `contributors <https://github.com/wakatime/wakatime/blob/master/AUTHORS>`_!

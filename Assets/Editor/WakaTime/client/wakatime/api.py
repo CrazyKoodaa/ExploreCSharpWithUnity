@@ -19,10 +19,10 @@ from .compat import u, is_py3, json
 from .constants import API_ERROR, AUTH_ERROR, SUCCESS, UNKNOWN_ERROR
 
 from .offlinequeue import Queue
-from .packages.requests.exceptions import RequestException
 from .session_cache import SessionCache
 from .utils import get_hostname, get_user_agent
 from .packages import tzlocal
+from .packages import certifi
 
 
 log = logging.getLogger('WakaTime')
@@ -36,6 +36,9 @@ except ImportError:  # pragma: nocover
     log.error('Please upgrade Python to the latest version.')
     print('Please upgrade Python to the latest version.')
     sys.exit(UNKNOWN_ERROR)
+
+
+from .packages.requests.exceptions import RequestException
 
 
 def send_heartbeats(heartbeats, args, configs, use_ntlm_proxy=False):
@@ -104,7 +107,7 @@ def send_heartbeats(heartbeats, args, configs, use_ntlm_proxy=False):
     try:
         response = session.post(api_url, data=request_body, headers=headers,
                                 proxies=proxies, timeout=timeout,
-                                verify=not args.nosslverify)
+                                verify=_get_verify(args))
     except RequestException:
         if should_try_ntlm:
             return send_heartbeats(heartbeats, args, configs, use_ntlm_proxy=True)
@@ -157,6 +160,129 @@ def send_heartbeats(heartbeats, args, configs, use_ntlm_proxy=False):
 
     session_cache.delete()
     return AUTH_ERROR if code == 401 else API_ERROR
+
+
+def get_time_today(args, use_ntlm_proxy=False):
+    """Get coding time from WakaTime API for given time range.
+
+    Returns total time as string or `None` when unable to fetch summary from
+    the API. When verbose output enabled, returns error message when unable to
+    fetch summary.
+    """
+
+    url = 'https://api.wakatime.com/api/v1/users/current/summaries'
+    timeout = args.timeout
+    if not timeout:
+        timeout = 60
+
+    api_key = u(base64.b64encode(str.encode(args.key) if is_py3 else args.key))
+    auth = u('Basic {api_key}').format(api_key=api_key)
+    headers = {
+        'User-Agent': get_user_agent(args.plugin),
+        'Accept': 'application/json',
+        'Authorization': auth,
+    }
+
+    session_cache = SessionCache()
+    session = session_cache.get()
+
+    should_try_ntlm = False
+    proxies = {}
+    if args.proxy:
+        if use_ntlm_proxy:
+            from .packages.requests_ntlm import HttpNtlmAuth
+            username = args.proxy.rsplit(':', 1)
+            password = ''
+            if len(username) == 2:
+                password = username[1]
+            username = username[0]
+            session.auth = HttpNtlmAuth(username, password, session)
+        else:
+            should_try_ntlm = '\\' in args.proxy
+            proxies['https'] = args.proxy
+
+    params = {
+        'start': 'today',
+        'end': 'today',
+    }
+
+    # send request to api
+    response, code = None, None
+    try:
+        response = session.get(url, params=params, headers=headers,
+                               proxies=proxies, timeout=timeout,
+                               verify=_get_verify(args))
+    except RequestException:
+        if should_try_ntlm:
+            return get_time_today(args, use_ntlm_proxy=True)
+
+        session_cache.delete()
+        if log.isEnabledFor(logging.DEBUG):
+            exception_data = {
+                sys.exc_info()[0].__name__: u(sys.exc_info()[1]),
+                'traceback': traceback.format_exc(),
+            }
+            log.error(exception_data)
+            return '{0}: {1}'.format(sys.exc_info()[0].__name__, u(sys.exc_info()[1])), API_ERROR
+        return None, API_ERROR
+
+    except:  # delete cached session when requests raises unknown exception
+        if should_try_ntlm:
+            return get_time_today(args, use_ntlm_proxy=True)
+
+        session_cache.delete()
+        if log.isEnabledFor(logging.DEBUG):
+            exception_data = {
+                sys.exc_info()[0].__name__: u(sys.exc_info()[1]),
+                'traceback': traceback.format_exc(),
+            }
+            log.error(exception_data)
+            return '{0}: {1}'.format(sys.exc_info()[0].__name__, u(sys.exc_info()[1])), API_ERROR
+        return None, API_ERROR
+
+    code = response.status_code if response is not None else None
+    content = response.text if response is not None else None
+
+    if code == requests.codes.ok:
+        try:
+            summary = response.json()['data'][0]
+            if len(summary['categories']) > 1:
+                text = ', '.join(['{0} {1}'.format(x['text'], x['name'].lower()) for x in summary['categories']])
+            else:
+                text = summary['grand_total']['text']
+            session_cache.save(session)
+            return text, SUCCESS
+        except:
+            if log.isEnabledFor(logging.DEBUG):
+                exception_data = {
+                    sys.exc_info()[0].__name__: u(sys.exc_info()[1]),
+                    'traceback': traceback.format_exc(),
+                }
+                log.error(exception_data)
+                return '{0}: {1}'.format(sys.exc_info()[0].__name__, u(sys.exc_info()[1])), API_ERROR
+            return None, API_ERROR
+    else:
+        if should_try_ntlm:
+            return get_time_today(args, use_ntlm_proxy=True)
+
+        session_cache.delete()
+        log.debug({
+            'response_code': code,
+            'response_text': content,
+        })
+        if log.isEnabledFor(logging.DEBUG):
+            return 'Error: {0}'.format(code), API_ERROR
+        return None, API_ERROR
+
+
+def _get_verify(args):
+    verify = not args.nosslverify
+    if verify:
+        if args.ssl_certs_file:
+            verify = args.ssl_certs_file
+        else:
+            verify = certifi.where()
+    return verify
 
 
 def _process_server_results(heartbeats, code, content, results, args, configs):
